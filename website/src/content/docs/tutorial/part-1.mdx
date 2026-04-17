@@ -136,7 +136,6 @@ import * as Effect from "effect/Effect";
 export default Alchemy.Stack(
   "MyApp",
   {
--   providers: Layer.empty,
 +   providers: Cloudflare.providers(),
   },
   Effect.gen(function* () {
@@ -155,7 +154,7 @@ Stack outputs let you see important values after a deploy. Return an
 object from the generator to expose them:
 
 ```typescript twoslash
-// ---cut---
+// alchemy.run.ts
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as Effect from "effect/Effect";
