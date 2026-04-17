@@ -71,7 +71,7 @@ Resources managed by Providers with state tracked between deploys.
 
 Create an `alchemy.run.ts` file:
 
-```typescript
+```typescript twoslash
 // alchemy.run.ts
 import * as Alchemy from "alchemy";
 import * as Effect from "effect/Effect";
@@ -126,7 +126,7 @@ TypeScript is telling us that `Layer.empty` doesn't provide
 Replace `Layer.empty` with `Cloudflare.providers()` to resolve the
 type error:
 
-```diff lang="typescript"
+```typescript twoslash
 // alchemy.run.ts
 import * as Alchemy from "alchemy";
 import * as Cloudflare from "alchemy/Cloudflare";

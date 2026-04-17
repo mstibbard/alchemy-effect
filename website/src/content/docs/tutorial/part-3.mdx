@@ -14,7 +14,9 @@ hit the live Worker over HTTP, and verify it works.
 Alchemy ships test utilities for Bun that wrap `bun:test` with Effect
 support. Create an empty test file:
 
-```typescript
+```typescript twoslash
+// @filename: ../alchemy.run.ts
+// ---cut---
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
@@ -26,7 +28,9 @@ import Stack from "../alchemy.run.ts";
 Use `beforeAll` with `deploy` to deploy your stack once before any
 tests run:
 
-```diff lang="typescript"
+```typescript twoslash
+// @filename: ../alchemy.run.ts
+// ---cut---
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
@@ -45,14 +49,15 @@ Write your first test. Use `yield* stack` to get the outputs you
 returned from your Stack in Part 2:
 
 ```typescript twoslash
+// @filename: ../alchemy.run.ts
+// ---cut---
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
-// @filename: ../alchemy.run.ts
 import Stack from "../alchemy.run.ts";
 
 const stack = beforeAll(deploy(Stack));
-// ---cut---
+
 +test(
 +  "worker returns a url",
 +  Effect.gen(function* () {
@@ -82,14 +87,15 @@ The basic test just checks that a URL exists. Let's verify the Worker
 actually handles requests:
 
 ```typescript twoslash
+// @filename: ../alchemy.run.ts
+// ---cut---
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
-// @filename: ../alchemy.run.ts
 import Stack from "../alchemy.run.ts";
 
 const stack = beforeAll(deploy(Stack));
-// ---cut---
+
 +import * as HttpClient from "effect/unstable/http/HttpClient";
 +import * as HttpBody from "effect/unstable/http/HttpBody";
 
@@ -139,6 +145,8 @@ Add `afterAll` with `destroy`, using `skipIf` to only tear down when
 `CI` is set:
 
 ```typescript twoslash
+// @filename: ../alchemy.run.ts
+// ---cut---
 import { 
 +   afterAll, 
   beforeAll, 
@@ -147,11 +155,9 @@ import {
   expect, 
   test,
 } from "alchemy/Test/Bun";
-// ---cut-start---
 import * as Effect from "effect/Effect";
 import * as HttpClient from "effect/unstable/http/HttpClient";
 import * as HttpBody from "effect/unstable/http/HttpBody";
-// @filename: ../alchemy.run.ts
 import Stack from "../alchemy.run.ts";
 
 const stack = beforeAll(deploy(Stack));
@@ -179,7 +185,6 @@ test(
     expect(response.status).toBe(404);
   }),
 );
-// ---cut-end---
 
 +afterAll.skipIf(!process.env.CI)(destroy(Stack));
 ```
