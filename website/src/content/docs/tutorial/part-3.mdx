@@ -44,7 +44,8 @@ import Stack from "../alchemy.run.ts";
 Write your first test. Use `yield* stack` to get the outputs you
 returned from your Stack in Part 2:
 
-```diff lang="typescript"
+```typescript twoslash
+// @noErrors
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
@@ -80,7 +81,8 @@ and skips unchanged resources.
 The basic test just checks that a URL exists. Let's verify the Worker
 actually handles requests:
 
-```diff lang="typescript"
+```typescript twoslash
+// @noErrors
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
@@ -135,7 +137,8 @@ stack. But on CI you want to clean up.
 Add `afterAll` with `destroy`, using `skipIf` to only tear down when
 `CI` is set:
 
-```diff lang="typescript"
+```typescript twoslash
+// @noErrors
 import { 
 +  afterAll, 
   beforeAll, 
