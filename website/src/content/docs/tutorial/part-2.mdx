@@ -6,6 +6,7 @@ sidebar:
 ---
 
 import Terminal from "../../../components/Terminal.astro";
+import { Code, Tabs, TabItem } from "@astrojs/starlight/components";
 
 In [Part 1](/tutorial/part-1) you deployed an R2 Bucket. Now you'll
 create a Cloudflare Worker that reads and writes objects in that
@@ -66,7 +67,7 @@ Update `alchemy.run.ts` to import it instead of declaring it inline:
 ```diff lang="typescript"
 // alchemy.run.ts
 import * as Alchemy from "alchemy";
--import * as Cloudflare from "alchemy/Cloudflare";
+import * as Cloudflare from "alchemy/Cloudflare";
 import * as Effect from "effect/Effect";
 +import { Bucket } from "./src/bucket.ts";
 
@@ -143,10 +144,10 @@ import * as Cloudflare from "alchemy/Cloudflare";
 import * as Effect from "effect/Effect";
 import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
 import { Bucket } from "./bucket.ts";
+  // ---cut---
 export default Cloudflare.Worker(
   "Worker",
   { main: import.meta.path },
-  // ---cut---
   Effect.gen(function* () {
     const bucket = yield* Cloudflare.R2Bucket.bind(Bucket);
 
@@ -156,7 +157,6 @@ export default Cloudflare.Worker(
       }),
     };
 +  }).pipe(Effect.provide(Cloudflare.R2BucketBindingLive)),
-  // ---cut-after---
 );
 ```
 
@@ -180,10 +180,11 @@ export const Bucket = Cloudflare.R2Bucket("Bucket");
 // @filename: index.ts
 import * as Cloudflare from "alchemy/Cloudflare";
 import * as Effect from "effect/Effect";
-import { HttpServerRequest } from "effect/unstable/http/HttpServerRequest";
 import * as HttpServerResponse from "effect/unstable/http/HttpServerResponse";
 import { Bucket } from "./bucket.ts";
 // ---cut---
++import { HttpServerRequest } from "effect/unstable/http/HttpServerRequest";
+
 export default Cloudflare.Worker(
   "Worker",
   { main: import.meta.path },
@@ -191,9 +192,9 @@ export default Cloudflare.Worker(
     const bucket = yield* Cloudflare.R2Bucket.bind(Bucket);
     return {
       fetch: Effect.gen(function* () {
-        const request = yield* HttpServerRequest;
-        const key = request.url.split("/").pop()!;
-
++        const request = yield* HttpServerRequest;
++        const key = request.url.split("/").pop()!;
++
 +        if (request.method === "PUT") {
 +          yield* bucket.put(key, request.stream, {
 +            contentLength: Number(request.headers["content-length"] ?? 0),
@@ -257,7 +258,6 @@ export default Cloudflare.Worker(
 +          ),
 +        ),
 +      ),
-      // ---cut-after---
     };
   }).pipe(Effect.provide(Cloudflare.R2BucketBindingLive)),
 );
@@ -309,6 +309,7 @@ export default Cloudflare.Worker(
 +        }
 +        const text = yield* object.text();
 +        return HttpServerResponse.text(text);
+-        return HttpServerResponse.text("Hello, world!");
       }).pipe(
         Effect.catchTag("R2Error", (error) =>
           Effect.succeed(
@@ -339,6 +340,7 @@ output:
 ```diff lang="typescript"
 // alchemy.run.ts
 import * as Alchemy from "alchemy";
+import * as Cloudflare from "alchemy/Cloudflare";
 import * as Effect from "effect/Effect";
 import { Bucket } from "./src/bucket.ts";
 +import Worker from "./src/worker.ts";
@@ -364,9 +366,20 @@ export default Alchemy.Stack(
 
 Deploy again. Alchemy detects the new Worker and the unchanged Bucket:
 
-```sh
-alchemy deploy
-```
+<Tabs syncKey="pkgManager">
+  <TabItem label="bun" icon="bun">
+    <Code code="bunx alchemy deploy" lang="sh" />
+  </TabItem>
+  <TabItem label="npm" icon="npm">
+    <Code code="npx alchemy deploy" lang="sh" />
+  </TabItem>
+  <TabItem label="pnpm" icon="pnpm">
+    <Code code="pnpm dlx alchemy deploy" lang="sh" />
+  </TabItem>
+  <TabItem label="yarn" icon="seti:yarn">
+    <Code code="yarn dlx alchemy deploy" lang="sh" />
+  </TabItem>
+</Tabs>
 
 <Terminal content={`[u]Plan[/u]: [g]1 to create[/g]
 
@@ -392,7 +405,7 @@ Use `curl` to write and read an object:
 ```sh
 # Store an object
 curl -X PUT https://myapp-worker-dev-you-abc123.workers.dev/hello.txt \
-  -d "Hello, world!"
+  -d 'Hello, world!'
 
 # Retrieve it
 curl https://myapp-worker-dev-you-abc123.workers.dev/hello.txt

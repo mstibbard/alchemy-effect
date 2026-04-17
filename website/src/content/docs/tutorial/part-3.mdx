@@ -26,13 +26,13 @@ import Stack from "../alchemy.run.ts";
 Use `beforeAll` with `deploy` to deploy your stack once before any
 tests run:
 
-```typescript ins={5}
+```diff lang="typescript"
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
 import Stack from "../alchemy.run.ts";
 
-const stack = beforeAll(deploy(Stack));
++const stack = beforeAll(deploy(Stack));
 ```
 
 `deploy(Stack)` returns an Effect that plans and applies the stack.
@@ -44,7 +44,7 @@ const stack = beforeAll(deploy(Stack));
 Write your first test. Use `yield* stack` to get the outputs you
 returned from your Stack in Part 2:
 
-```typescript ins={8-14}
+```diff lang="typescript"
 // test/integ.test.ts
 import { beforeAll, deploy, expect, test } from "alchemy/Test/Bun";
 import * as Effect from "effect/Effect";
@@ -52,14 +52,14 @@ import Stack from "../alchemy.run.ts";
 
 const stack = beforeAll(deploy(Stack));
 
-test(
-  "worker returns a url",
-  Effect.gen(function* () {
-    const { url } = yield* stack;
-
-    expect(url).toBeString();
-  }),
-);
++test(
++  "worker returns a url",
++  Effect.gen(function* () {
++    const { url } = yield* stack;
++
++    expect(url).toBeString();
++  }),
++);
 ```
 
 `test(name, effect)` wraps `bun:test` — you write an Effect generator
@@ -136,20 +136,21 @@ Add `afterAll` with `destroy`, using `skipIf` to only tear down when
 `CI` is set:
 
 ```diff lang="typescript"
-import {
-+ afterAll,
-  beforeAll,
-  deploy,
-+ destroy,
-  expect,
+import { 
++  afterAll, 
+  beforeAll, 
+  deploy, 
++  destroy, 
+  expect, 
   test,
 } from "alchemy/Test/Bun";
-+import * as Effect from "effect/Effect";
-+import * as HttpClient from "effect/unstable/http/HttpClient";
-+import * as HttpBody from "effect/unstable/http/HttpBody";
+import * as Effect from "effect/Effect";
+import * as HttpClient from "effect/unstable/http/HttpClient";
+import * as HttpBody from "effect/unstable/http/HttpBody";
 import Stack from "../alchemy.run.ts";
 
 const stack = beforeAll(deploy(Stack));
+
 +afterAll.skipIf(!process.env.CI)(destroy(Stack));
 ```
 

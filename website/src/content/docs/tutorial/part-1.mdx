@@ -178,11 +178,33 @@ export default Alchemy.Stack(
 
 ## Deploy
 
-Run `alchemy deploy` to create the Bucket on Cloudflare:
+Set your Cloudflare environment variables.
 
 ```sh
-alchemy deploy
+export CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+export CLOUDFLARE_API_TOKEN=your_api_token_here
 ```
+
+:::note
+Find your Cloudflare Account ID on [Account Home](https://dash.cloudflare.com/?to=/:account/home) and [create your Cloudflare API Token here](https://dash.cloudflare.com/profile/api-tokens). The "Edit Cloudflare Workers" template is sufficient for this tutorial.
+:::
+
+Run `alchemy deploy` to create the Bucket on Cloudflare:
+
+<Tabs syncKey="pkgManager">
+  <TabItem label="bun" icon="bun">
+    <Code code="bunx alchemy deploy" lang="sh" />
+  </TabItem>
+  <TabItem label="npm" icon="npm">
+    <Code code="npx alchemy deploy" lang="sh" />
+  </TabItem>
+  <TabItem label="pnpm" icon="pnpm">
+    <Code code="pnpm dlx alchemy deploy" lang="sh" />
+  </TabItem>
+  <TabItem label="yarn" icon="seti:yarn">
+    <Code code="yarn dlx alchemy deploy" lang="sh" />
+  </TabItem>
+</Tabs>
 
 <Terminal content={`[u]Plan[/u]: [g]1 to create[/g]
 [g]+[/g] [b]Bucket[/b] [d](Cloudflare.R2Bucket)[/d]
@@ -204,6 +226,8 @@ project. You can specify a different file with
 :::
 
 ## Verify it worked
+
+Your newly created R2 bucket will be listed on the [Cloudflare R2 Object Storage Dashboard](https://dash.cloudflare.com/?to=/:account/r2/overview).
 
 Run `alchemy deploy` again. Because nothing changed, the bucket shows
 as a no-op:
